@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/aoc2021
+aoc2021.so
+aoc2021.dylib
+aoc2021.dll
+aoc2021.a
+aoc2021.lib
+aoc2021-test-*
+*.exe
+*.o
+*.obj
+*.lst

@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"Victor Carvalho"
+	],
+	"copyright": "Copyright © 2021, Victor Carvalho",
+	"description": "A minimal D application.",
+	"license": "proprietary",
+	"name": "aoc2021"
+}
