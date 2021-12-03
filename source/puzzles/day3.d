@@ -67,3 +67,68 @@ void secondPuzzle() {
   auto co2Rate = findRateForPattern!((oneCount, zeroCount) => oneCount < zeroCount)(content);
   stdout.writefln("multiplying the oxygen generator rating (%012b) and the CO2 scrubber rating (%012b) we get %d", oxygenRate, co2Rate, oxygenRate * co2Rate);
 }
+
+// using a trie to store the lines
+void secondPuzzleVariant() {
+  auto node = new Node();
+  foreach (line; File("inputs/day3.txt", "r").byLine) {
+    node.add(line);
+  }
+  auto oxygenRate = node.mostCommon.binaryStringToInt;
+  auto co2Rate = node.leastCommon.binaryStringToInt;
+  stdout.writefln("multiplying the oxygen generator rating (%012b) and the CO2 scrubber rating (%012b) we get %d", oxygenRate, co2Rate, oxygenRate * co2Rate);
+}
+
+struct Node {
+  void add(char[] s) {
+    if (s.empty)
+      return;
+    if (s.front == '1') {
+      if (ones == null)
+        ones = new Node();
+      ones.add(s[1..$]);
+    } else {
+      if (zeros == null)
+        zeros = new Node();
+      zeros.add(s[1..$]);
+    }
+    length += 1;
+  }
+private:
+  size_t length;
+  Node* ones;
+  Node* zeros;
+}
+
+size_t nodeLength(Node* node) {
+  return node == null ? 0 : node.length;
+}
+
+void chooseString(alias choose)(Node* node, Appender!string app) {
+  Node* chosen;;
+  if (node.length == 1) {
+    chosen = node.ones.nodeLength > 0 ? node.ones : node.zeros;
+  } else {
+    chosen = choose(node);
+  }
+  if (chosen == null)
+    return;
+  app ~= chosen == node.ones ? '1' : '0';
+  chooseString!choose(chosen, app);
+}
+
+string mostCommon(Node* node) {
+  auto app = appender!string;
+  node.chooseString!((node) {
+    return node.ones.nodeLength >= node.zeros.nodeLength ? node.ones : node.zeros;
+  })(app);
+  return app[];
+}
+
+string leastCommon(Node* node) {
+  auto app = appender!string;
+  node.chooseString!((node) {
+    return node.ones.nodeLength < node.zeros.nodeLength ? node.ones : node.zeros;
+  })(app);
+  return app[];
+}
