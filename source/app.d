@@ -1,7 +1,7 @@
 import std.array;
 import std.stdio;
 
-enum lastDay = 2;
+enum lastDay = 3;
 
 string[] buildDaysList() {
 	assert(__ctfe);
