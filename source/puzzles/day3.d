@@ -38,40 +38,32 @@ int binaryStringToInt(string s) {
   return result;
 }
 
-int findRateForPattern(alias f)(string[] allLines) {
-  auto lines = allLines.dup;
+char findExpectedBit(alias pred, R)(R range, size_t col) {
   auto oneCount = 0;
   auto totalCount = 0;
-  for (int i = 0; i < lines.length; i++) {
-    if (lines[i].front == '1')
+  foreach(line; range) {
+    if (line[col] == '1')
       oneCount += 1;
     totalCount += 1;
   }
-  auto expectedBit = f(oneCount, totalCount - oneCount);
+  return pred(oneCount, totalCount - oneCount) ? '1' : '0';
+}
+
+int findRateForPattern(alias pred)(string[] allLines) {
+  auto lines = allLines.dup;
+  auto expectedBit = findExpectedBit!pred(lines, 0);
   for (int i = 0; i < 12; i++) {
-    auto current = 0;
-    oneCount = 0;
-    totalCount = 0;
-    while (lines.length > 1 && current < lines.length) {
-      if (lines[current][i] != expectedBit) {
-        lines.fastRemove(current);
-        continue;
-      }
-      if (i + 1 == lines[current].length)
-        continue;
-      if (lines[current][i+1] == '1')
-        oneCount += 1;
-      current += 1;
-    }
-    totalCount = current;
-    expectedBit = f(oneCount, totalCount - oneCount);
+    lines = lines.remove!(s => s[i] != expectedBit, SwapStrategy.unstable);
+    if (lines.length == 1)
+      break;
+    expectedBit = lines.findExpectedBit!pred(i+1);
   }
   return lines.front.binaryStringToInt;
 }
 
 void secondPuzzle() {
   auto content = File("inputs/day3.txt", "r").byLineCopy.array;
-  auto oxygenRate = findRateForPattern!((oneCount, zeroCount) => oneCount >= zeroCount ? '1' : '0')(content);
-  auto co2Rate = findRateForPattern!((oneCount, zeroCount) => oneCount < zeroCount ? '1' : '0')(content);
+  auto oxygenRate = findRateForPattern!((oneCount, zeroCount) => oneCount >= zeroCount)(content);
+  auto co2Rate = findRateForPattern!((oneCount, zeroCount) => oneCount < zeroCount)(content);
   stdout.writefln("multiplying the oxygen generator rating (%012b) and the CO2 scrubber rating (%012b) we get %d", oxygenRate, co2Rate, oxygenRate * co2Rate);
 }
