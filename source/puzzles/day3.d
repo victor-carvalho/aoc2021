@@ -4,7 +4,6 @@ import std.array;
 import std.algorithm;
 import std.conv: to;
 import std.stdio;
-import utils.array;
 
 void firstPuzzle() {
   int[] oneCount;
@@ -105,7 +104,7 @@ size_t nodeLength(Node* node) {
 }
 
 void chooseString(alias choose)(Node* node, Appender!string app) {
-  Node* chosen;;
+  Node* chosen;
   if (node.length == 1) {
     chosen = node.ones.nodeLength > 0 ? node.ones : node.zeros;
   } else {
